@@ -1,0 +1,42 @@
+# =========================
+# Spring Boot & Maven
+# =========================
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# =========================
+# IntelliJ IDEA & IDEs
+# =========================
+.idea/
+*.iml
+*.iws
+*.classpath
+*.project
+.settings/
+.vscode/
+
+# =========================
+# OS Generated Files
+# =========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# =========================
+# H2 File-Based Database
+# =========================
+finance-db.mv.db
+finance-db.trace.db
+
+# =========================
+# Logs and Temp Files
+# =========================
+*.log
+tmp/
+temp/
