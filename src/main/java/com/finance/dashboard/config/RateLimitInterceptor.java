@@ -6,11 +6,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.time.Duration;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -19,9 +22,18 @@ public class RateLimitInterceptor implements HandlerInterceptor {
     private final Map<String, Bucket> cache = new ConcurrentHashMap<>();
 
     @Override
-    public boolean preHandle(HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) throws Exception {
-        String ip = request.getRemoteAddr();
-        Bucket bucket = cache.computeIfAbsent(ip, this::createNewBucket);
+    public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) throws Exception {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String rateLimitKey;
+
+        if (auth != null && auth.isAuthenticated() && !Objects.equals(auth.getPrincipal(), "anonymousUser")) {
+            rateLimitKey = auth.getName();
+        } else {
+            rateLimitKey = request.getRemoteAddr();
+        }
+
+        Bucket bucket = cache.computeIfAbsent(rateLimitKey, this::createNewBucket);
 
         if (bucket.tryConsume(1)) {
             return true;
